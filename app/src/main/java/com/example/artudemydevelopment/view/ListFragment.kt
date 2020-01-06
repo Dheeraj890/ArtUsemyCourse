@@ -1,6 +1,7 @@
 package com.example.artudemydevelopment.view
 
 
+import android.opengl.Visibility
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -23,16 +24,37 @@ class ListFragment : Fragment() {
 
     private lateinit var viewModel:ListViewModel
     private val listAdapter=AnimalListAdapter(arrayListOf())
-    private val animalListDataObserver=Observer<List<Animal>>{
+    private val animalListDataObserver=Observer<List<Animal>>{ list->
 
-        list->
+
+        list?.let{
+
+            animalList.visibility=View.VISIBLE
+            listAdapter.updateAnimalList(list)
+
+    }
     }
 
 
-    private val loadingLiveDataObserver= Observer<Boolean> {isLoading ->  }
+    private val loadingLiveDataObserver= Observer<Boolean> {isLoading ->
 
 
-    private val errorLiveDataObserver= Observer<Boolean> {isError ->  }
+        loadingView.visibility=if(isLoading) View.VISIBLE else View.GONE
+        if(isLoading){
+
+            listError.visibility=View.GONE
+            animalList.visibility=View.GONE
+        }
+    }
+
+
+    private val errorLiveDataObserver= Observer<Boolean> {isError ->
+
+
+
+        listError.visibility=if(isError) View.VISIBLE else View.GONE
+
+    }
 
 
 
@@ -66,6 +88,15 @@ class ListFragment : Fragment() {
 
 
 
+        refreshLayout.setOnRefreshListener{
+
+
+            animalList.visibility=View.GONE
+            listError.visibility=View.GONE
+            loadingView.visibility=View.VISIBLE
+            viewModel.refresh()
+            refreshLayout.isRefreshing=false
+        }
 
 
 
