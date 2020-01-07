@@ -3,10 +3,15 @@ package com.example.artudemydevelopment.view
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.artudemydevelopment.R
 import com.example.artudemydevelopment.model.Animal
+import com.example.artudemydevelopment.util.getProgresDrawable
+import com.example.artudemydevelopment.util.loadImage
 import kotlinx.android.synthetic.main.item_animal.view.*
+
+
 
 class AnimalListAdapter(private val animalList: ArrayList<Animal>):RecyclerView.Adapter<AnimalListAdapter.AnimalViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnimalViewHolder {
@@ -22,6 +27,10 @@ class AnimalListAdapter(private val animalList: ArrayList<Animal>):RecyclerView.
 
 
         holder.view.animalName.text=animalList[position].name
+        holder.view.animalImage.loadImage(animalList[position].imageUrl,
+            getProgresDrawable(holder.view.context))
+
+
 
 
     }

@@ -4,6 +4,12 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import com.example.artudemydevelopment.model.Animal
+import com.example.artudemydevelopment.model.AnimalApiService
+import com.example.artudemydevelopment.model.ApiKey
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.observers.DisposableSingleObserver
+import io.reactivex.schedulers.Schedulers
 
 
 //We use AndroidViewModel instead of model because this model may need context object to perform some operations which are not possible
@@ -16,36 +22,96 @@ class ListViewModel(application: Application):AndroidViewModel(application) {
     val loadError by lazy { MutableLiveData<Boolean>() }
     val loading by lazy { MutableLiveData<Boolean>() }
 
+    private  val disposable=CompositeDisposable()
+    private val apiService=AnimalApiService()
+
 
     fun refresh(){
+        loading.value=true
+      getKey()
+    }
 
-        getAnimal()
+    private fun getKey(){
+disposable.add(apiService.getApiKey()
+    .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+    .subscribeWith(object :DisposableSingleObserver<ApiKey>(){
+        override fun onSuccess(key: ApiKey) {
+
+            if (key.key.isNullOrEmpty()){
+
+                loadError.value=true
+                loading.value=false
+            }else
+            {
+                getAnimal(key.key)
+            }
+
+
+        }
+
+        override fun onError(e: Throwable) {
+
+            loadError.value=true
+            loading.value=false
+            e.printStackTrace()
+
+        }
+    }))
 
     }
 
-    private fun getAnimal(){
+    private fun getAnimal(key:String){
 
-        val a1=Animal("Aligator")
-        val a2=Animal("bee")
+        disposable.add(apiService.getAnimals(key)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object :DisposableSingleObserver<List<Animal>>(){
 
-        val a3=Animal("cat")
-
-        val a4=Animal("dog")
-        val a5=Animal("elephant")
-        val a6=Animal("flamingo")
+                override fun onSuccess(list: List<Animal>) {
 
 
-        val animalList= arrayListOf(a1,a2,a3,a4,a5,a6)
+                    animals.value=list
+                    loadError.value=false
+                    loading.value=false
+                }
 
-        animals.value=animalList
-        loadError.value=false
-        loading.value=false
+                override fun onError(e: Throwable) {
+
+                    loading.value=false
+                    animals.value=null
+                    loadError.value=true
+                }
 
 
+            }))
 
 
 
     }
 
+
+
+
+    //        val a1=Animal("Aligator")
+//        val a2=Animal("bee")
+//
+//        val a3=Animal("cat")
+//
+//        val a4=Animal("dog")
+//        val a5=Animal("elephant")
+//        val a6=Animal("flamingo")
+//
+//
+//        val animalList= arrayListOf(a1,a2,a3,a4,a5,a6)
+//
+//        animals.value=animalList
+//        loadError.value=false
+//        loading.value=false
+
+
+    override fun onCleared() {
+        super.onCleared()
+        disposable.clear()
+    }
 
 }
