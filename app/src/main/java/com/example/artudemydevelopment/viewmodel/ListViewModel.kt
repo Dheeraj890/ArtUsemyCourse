@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.artudemydevelopment.model.Animal
 import com.example.artudemydevelopment.model.AnimalApiService
 import com.example.artudemydevelopment.model.ApiKey
+import com.example.artudemydevelopment.util.SharedPrefrencesHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
@@ -25,10 +26,33 @@ class ListViewModel(application: Application):AndroidViewModel(application) {
     private  val disposable=CompositeDisposable()
     private val apiService=AnimalApiService()
 
+    private val prefs=SharedPrefrencesHelper(getApplication())
+
+    private var invalidApiKey=false
+
+
+
 
     fun refresh(){
+        invalidApiKey=false
+        val key=prefs.getApiKey()
+        if(key.isNullOrEmpty())
+        {
+            getKey()
+        }
+        else{
+
+            getAnimal(key)
+        }
         loading.value=true
-      getKey()
+
+    }
+
+    fun hardRefreshKey(){
+
+        loading.value=true
+        getKey()
+
     }
 
     private fun getKey(){
@@ -43,6 +67,7 @@ disposable.add(apiService.getApiKey()
                 loading.value=false
             }else
             {
+                prefs.saveApiKey(key.key)
                 getAnimal(key.key)
             }
 
@@ -77,9 +102,16 @@ disposable.add(apiService.getApiKey()
 
                 override fun onError(e: Throwable) {
 
-                    loading.value=false
-                    animals.value=null
-                    loadError.value=true
+                    if(!invalidApiKey){
+
+                        invalidApiKey=true
+                        getKey()
+                    }else {
+                        e.printStackTrace()
+                        loading.value = false
+                        animals.value = null
+                        loadError.value = true
+                    }
                 }
 
 

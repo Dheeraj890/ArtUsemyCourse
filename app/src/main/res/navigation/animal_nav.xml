@@ -18,13 +18,20 @@
         android:id="@+id/detailFragment"
         android:name="com.example.artudemydevelopment.view.DetailFragment"
         android:label="fragment_detail"
-        tools:layout="@layout/fragment_detail" >
+        tools:layout="@layout/fragment_detail">
         <action
             android:id="@+id/actionList"
             app:destination="@id/listFragment" />
         <action
             android:id="@+id/action_dummyFragment"
             app:destination="@id/dummyFragment" />
+        <argument
+            android:name="animal"
+            app:argType="com.example.artudemydevelopment.model.Animal" />
+        <argument
+            app:nullable="true"
+            android:name="Speed"
+            app:argType="com.example.artudemydevelopment.model.Speed" />
     </fragment>
     <fragment
         android:id="@+id/dummyFragment"
@@ -34,5 +41,9 @@
         <action
             android:id="@+id/action_dummyFragment_to_listFragment"
             app:destination="@id/listFragment" />
+        <argument
+            android:name="abs"
+            app:argType="integer"
+            android:defaultValue="0" />
     </fragment>
 </navigation>

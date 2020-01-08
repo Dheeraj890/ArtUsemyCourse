@@ -84,6 +84,7 @@ class ListFragment : Fragment() {
 
 
             layoutManager=GridLayoutManager(context,2)
+            adapter=listAdapter
         }
 
 
@@ -94,7 +95,7 @@ class ListFragment : Fragment() {
             animalList.visibility=View.GONE
             listError.visibility=View.GONE
             loadingView.visibility=View.VISIBLE
-            viewModel.refresh()
+            viewModel.hardRefreshKey()
             refreshLayout.isRefreshing=false
         }
 

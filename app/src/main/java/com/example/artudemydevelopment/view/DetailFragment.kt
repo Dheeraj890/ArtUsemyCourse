@@ -9,6 +9,9 @@ import android.view.ViewGroup
 import androidx.navigation.Navigation
 
 import com.example.artudemydevelopment.R
+import com.example.artudemydevelopment.model.Animal
+import com.example.artudemydevelopment.util.getProgresDrawable
+import com.example.artudemydevelopment.util.loadImage
 import kotlinx.android.synthetic.main.fragment_detail.*
 import kotlinx.android.synthetic.main.fragment_list.*
 
@@ -16,6 +19,9 @@ import kotlinx.android.synthetic.main.fragment_list.*
  * A simple [Fragment] subclass.
  */
 class DetailFragment : Fragment() {
+
+
+    var animal:Animal? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,6 +35,21 @@ class DetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
+        arguments?.let {
+
+            animal=DetailFragmentArgs.fromBundle(it).animal
+        }
+
+context?.let {
+    animalImage.loadImage(animal?.imageUrl, getProgresDrawable(it))
+}
+
+        animalName.text=animal?.name
+        animalLocation.text=animal?.location
+        animalLifeSpan.text=animal?.lifeSpan
+        animalDiet.text=animal?.diet
 
 //        buttonList.setOnClickListener {
 //

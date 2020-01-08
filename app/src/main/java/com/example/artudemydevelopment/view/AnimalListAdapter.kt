@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.example.artudemydevelopment.R
 import com.example.artudemydevelopment.model.Animal
@@ -29,6 +30,12 @@ class AnimalListAdapter(private val animalList: ArrayList<Animal>):RecyclerView.
         holder.view.animalName.text=animalList[position].name
         holder.view.animalImage.loadImage(animalList[position].imageUrl,
             getProgresDrawable(holder.view.context))
+        holder.view.animalLayout.setOnClickListener{
+
+            val action=ListFragmentDirections.actionDetail(animalList[position],null)
+            Navigation.findNavController(holder.view).navigate(action)
+
+        }
 
 
 
