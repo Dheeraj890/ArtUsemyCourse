@@ -1,7 +1,9 @@
 package com.example.artudemydevelopment.util
 
 import android.content.Context
+import android.view.View
 import android.widget.ImageView
+import androidx.databinding.BindingAdapter
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -29,4 +31,24 @@ fun getProgresDrawable(context: Context):CircularProgressDrawable {
                 .load(uri)
                 .into(this)
     }
+
+
+
+@BindingAdapter("android:imageUrl")
+fun loadImage(view:ImageView,url:String?){
+
+    view.loadImage(url, getProgresDrawable(view.context))
+
+
+}
+
+@BindingAdapter("android:colorset")
+fun setColor(view:View,color:Int){
+
+
+    view.setBackgroundColor(color)
+
+}
+
+
 
