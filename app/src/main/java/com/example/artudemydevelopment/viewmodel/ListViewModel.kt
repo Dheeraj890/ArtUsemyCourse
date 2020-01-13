@@ -3,6 +3,10 @@ package com.example.artudemydevelopment.viewmodel
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.example.artudemydevelopment.di.AppModule
+import com.example.artudemydevelopment.di.CONTEXT_APP
+import com.example.artudemydevelopment.di.DaggerViewModelComponent
+import com.example.artudemydevelopment.di.TypeOfContext
 import com.example.artudemydevelopment.model.Animal
 import com.example.artudemydevelopment.model.AnimalApiService
 import com.example.artudemydevelopment.model.ApiKey
@@ -11,6 +15,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.observers.DisposableSingleObserver
 import io.reactivex.schedulers.Schedulers
+import javax.inject.Inject
 
 
 //We use AndroidViewModel instead of model because this model may need context object to perform some operations which are not possible
@@ -24,13 +29,24 @@ class ListViewModel(application: Application):AndroidViewModel(application) {
     val loading by lazy { MutableLiveData<Boolean>() }
 
     private  val disposable=CompositeDisposable()
-    private val apiService=AnimalApiService()
 
-    private val prefs=SharedPrefrencesHelper(getApplication())
+    @Inject
+    lateinit var apiService:AnimalApiService
+
+    @Inject
+    @field:TypeOfContext(CONTEXT_APP)
+   lateinit var prefs:SharedPrefrencesHelper
 
     private var invalidApiKey=false
 
 
+    init {
+
+
+        DaggerViewModelComponent.builder().appModule(AppModule(getApplication()))
+            .build().inject(this)
+
+    }
 
 
     fun refresh(){
@@ -58,6 +74,7 @@ class ListViewModel(application: Application):AndroidViewModel(application) {
     private fun getKey(){
 disposable.add(apiService.getApiKey()
     .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+
     .subscribeWith(object :DisposableSingleObserver<ApiKey>(){
         override fun onSuccess(key: ApiKey) {
 
