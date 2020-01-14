@@ -9,13 +9,13 @@ import javax.inject.Qualifier
 import javax.inject.Singleton
 
 @Module
-class PrefsModule {
+open class PrefsModule {
 
 
     @Provides
     @Singleton
     @TypeOfContext(CONTEXT_APP)
-    fun providesSharedPrefrences(app: Application): SharedPrefrencesHelper {
+  open  fun providesSharedPrefrences(app: Application): SharedPrefrencesHelper {
 
 
         return SharedPrefrencesHelper(app)

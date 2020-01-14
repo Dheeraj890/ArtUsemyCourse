@@ -23,6 +23,15 @@ import javax.inject.Inject
 //because activity context are transients and  may destroy on time to time like on orientation change process.
 class ListViewModel(application: Application):AndroidViewModel(application) {
 
+
+    constructor(application: Application,test:Boolean=true):this(application){
+
+
+        injected=true
+
+    }
+
+
     //Only need to be created when it is needed
     val animals by lazy{MutableLiveData<List<Animal>>()}
     val loadError by lazy { MutableLiveData<Boolean>() }
@@ -35,21 +44,26 @@ class ListViewModel(application: Application):AndroidViewModel(application) {
 
     @Inject
     @field:TypeOfContext(CONTEXT_APP)
-   lateinit var prefs:SharedPrefrencesHelper
+    lateinit var prefs:SharedPrefrencesHelper
 
     private var invalidApiKey=false
 
+    private var injected=false
 
-    init {
+    fun inject() {
 
 
-        DaggerViewModelComponent.builder().appModule(AppModule(getApplication()))
-            .build().inject(this)
+        if(!injected) {
+            DaggerViewModelComponent.builder().appModule(AppModule(getApplication()))
+                .build().inject(this)
+        }
 
     }
 
 
     fun refresh(){
+        inject()
+        loading.value=true
         invalidApiKey=false
         val key=prefs.getApiKey()
         if(key.isNullOrEmpty())
@@ -60,12 +74,13 @@ class ListViewModel(application: Application):AndroidViewModel(application) {
 
             getAnimal(key)
         }
-        loading.value=true
+
 
     }
 
     fun hardRefreshKey(){
 
+        inject()
         loading.value=true
         getKey()
 
